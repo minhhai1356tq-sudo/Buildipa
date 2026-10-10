@@ -125,17 +125,37 @@ jobs:
           echo "=== Custom Podfile written successfully ==="
           cat ios/Podfile
 
-      - name: Build iOS (no codesign)
-        run: flutter build ios --release --no-codesign
+      # BƯỚC QUYẾT ĐỊNH: Dùng xcodebuild trực tiếp thay vì flutter build ios
+      - name: Build iOS with xcodebuild (no codesign)
+        run: |
+          set -e
+          cd ios
+          # Chạy pod install thủ công trước khi build
+          pod install --repo-update
+
+          # Build bằng xcodebuild với các flag tắt signing
+          xcodebuild \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath ../build/Runner.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            archive
 
       - name: Locate built app
         id: locate
         run: |
           set -e
-          APP_PATH=$(find build/ios/iphoneos -name "*.app" -type d | head -1)
+          # Tìm file .app trong archive
+          APP_PATH=$(find build/Runner.xcarchive/Products/Applications -name "*.app" -type d | head -1)
           if [ -z "$APP_PATH" ]; then
             echo "Error: Could not find .app"
-            ls -la build/ios/ || true
+            ls -la build/Runner.xcarchive/Products/Applications/ || true
             exit 1
           fi
           echo "Found app at: $APP_PATH"
