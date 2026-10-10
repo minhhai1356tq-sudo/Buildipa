@@ -1,5 +1,5 @@
 {
-  "project": "aigrolb",
+  "project": "aitro",
   "platform": "ios",
   "github": {
     "owner": "minhhai1356tq-sudo",
@@ -8,9 +8,7 @@
   "provider": "github",
   "codemagic": {},
   "bitrise": {},
-  "ios": {
-    "path": "ios"
-  },
+  "ios": {},
   "flutter": {
     "watch": {}
   },
