@@ -2,6 +2,17 @@ name: Build iOS IPA
 
 on:
   workflow_dispatch:
+    inputs:
+      build_id:
+        description: 'Unique build identifier'
+        required: false
+        type: string
+        default: ''
+      snapshot_ref:
+        description: 'Ref holding the working-tree snapshot to build'
+        required: false
+        type: string
+        default: ''
   push:
     branches:
       - main
@@ -14,6 +25,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Checkout working-tree snapshot
+        if: inputs.snapshot_ref != ''
+        env:
+          SNAPSHOT_REF: ${{ inputs.snapshot_ref }}
+        run: |
+          set -e
+          git fetch --depth=1 origin "+$SNAPSHOT_REF:refs/heads/snapshot"
+          git checkout --force snapshot
+          echo "Building $(git rev-parse --short HEAD)"
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
