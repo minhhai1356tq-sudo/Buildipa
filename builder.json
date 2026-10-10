@@ -1,0 +1,20 @@
+{
+  "project": "aigrolb",
+  "platform": "ios",
+  "github": {
+    "owner": "minhhai1356tq-sudo",
+    "repo": "Buildipa"
+  },
+  "provider": "github",
+  "codemagic": {},
+  "bitrise": {},
+  "ios": {
+    "path": "ios"
+  },
+  "flutter": {
+    "watch": {}
+  },
+  "reactNative": {},
+  "kmp": {},
+  "mobai": {}
+}
