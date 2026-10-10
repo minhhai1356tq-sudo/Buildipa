@@ -203,12 +203,19 @@ final class PdfrxDataBankPdfTextExtractor implements DataBankPdfTextExtractor {
       final totalPages = document.pages.length;
       for (var index = 0; index < totalPages; index++) {
         cancellationToken.throwIfCancelled();
-        final pageText = await document.pages[index].loadText();
+                final pageText = await document.pages[index].loadText();
         cancellationToken.throwIfCancelled();
+        final text = pageText?.fullText;
+        if (text == null) {
+          throw DataBankIngestionException(
+            DataBankIngestionFailureCode.corruptDocument,
+            'Cannot read text from page ${index + 1}.',
+          );
+        }
         pages.add(
           DataBankPdfPage(
             pageNumber: index + 1,
-            text: pageText.fullText,
+            text: text,
           ),
         );
         onProgress(index + 1, totalPages);

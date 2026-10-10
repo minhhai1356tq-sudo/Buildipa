@@ -46,18 +46,7 @@ jobs:
         run: flutter pub get
 
       - name: Regenerate iOS files
-        run: flutter create . --platforms=ios --project-name=nativetavern || true
-
-      - name: Strip signing configs from Xcode project
-        run: |
-          set -e
-          PBXPROJ="ios/Runner.xcodeproj/project.pbxproj"
-          sed -i '' '/DEVELOPMENT_TEAM/d' "$PBXPROJ"
-          sed -i '' '/CODE_SIGN_IDENTITY/d' "$PBXPROJ"
-          sed -i '' '/CODE_SIGNING_REQUIRED/d' "$PBXPROJ"
-          sed -i '' '/CODE_SIGNING_ALLOWED/d' "$PBXPROJ"
-          sed -i '' '/CODE_SIGN_STYLE/d' "$PBXPROJ"
-          sed -i '' '/PROVISIONING_PROFILE_SPECIFIER/d' "$PBXPROJ"
+        run: flutter create . --platforms=ios --project-name=nativetavern
 
       - name: Build iOS with xcodebuild (no codesign)
         run: |

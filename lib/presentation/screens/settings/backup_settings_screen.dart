@@ -980,14 +980,12 @@ class _BackupSettingsScreenState extends ConsumerState<BackupSettingsScreen> {
   void _backupToICloud(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
 
-    // Get actual data from database
     final db = ref.read(databaseProvider);
     final dbBackupService = DatabaseBackupService(db);
-    final data = await dbBackupService.exportAllData();
 
     final result = await ref
         .read(cloudBackupOperationProvider.notifier)
-        .uploadToICloud(data);
+        .uploadToICloud(() => dbBackupService.exportAllData());
 
     if (result != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1101,14 +1099,12 @@ class _BackupSettingsScreenState extends ConsumerState<BackupSettingsScreen> {
   void _backupToGoogleDrive(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context);
 
-    // Get actual data from database
     final db = ref.read(databaseProvider);
     final dbBackupService = DatabaseBackupService(db);
-    final data = await dbBackupService.exportAllData();
 
     final result = await ref
         .read(cloudBackupOperationProvider.notifier)
-        .uploadToGoogleDrive(data);
+        .uploadToGoogleDrive(() => dbBackupService.exportAllData());
 
     if (result != null && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
