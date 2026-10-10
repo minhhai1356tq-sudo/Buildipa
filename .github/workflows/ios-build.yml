@@ -36,33 +36,78 @@ jobs:
           git checkout --force snapshot
           echo "Building $(git rev-parse --short HEAD)"
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,x86_64-apple-ios,aarch64-apple-ios-sim
+
+      - name: Install cargo-ndk and other Rust iOS tools
+        run: |
+          cargo install cargo-lipo || true
+          rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
 
+      - name: Flutter doctor
+        run: flutter doctor -v
+
       - name: Flutter pub get
         run: flutter pub get
+
+      - name: Clean build cache
+        run: flutter clean
+
+      - name: Regenerate iOS files
+        run: |
+          set -e
+          flutter create . --platforms=ios --project-name=nativetavern || true
+          ls -la ios/
+
+      - name: Setup CocoaPods
+        run: |
+          gem install cocoapods --no-document || true
+          pod --version
+
+      - name: Pod install
+        working-directory: ./ios
+        run: |
+          set -e
+          if [ -f Podfile ]; then
+            pod install --repo-update
+          else
+            echo "No Podfile found, skipping pod install"
+          fi
 
       - name: Build iOS (no codesign)
         run: flutter build ios --release --no-codesign
 
-      - name: Create IPA
+      - name: Locate built app
+        id: locate
         run: |
           set -e
           APP_PATH=$(find build/ios/iphoneos -name "*.app" -type d | head -1)
           if [ -z "$APP_PATH" ]; then
             echo "Error: Could not find .app"
+            ls -la build/ios/ || true
             exit 1
           fi
           echo "Found app at: $APP_PATH"
+          echo "app_path=$APP_PATH" >> $GITHUB_OUTPUT
+
+      - name: Create IPA
+        run: |
+          set -e
           mkdir -p build/Payload
-          cp -R "$APP_PATH" build/Payload/
+          cp -R "${{ steps.locate.outputs.app_path }}" build/Payload/
           cd build
           zip -rq app.ipa Payload
           rm -rf Payload
           echo "Created IPA: build/app.ipa"
+          ls -lh app.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
