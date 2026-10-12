@@ -1,0 +1,18 @@
+{
+  "project": "AIgemni",
+  "platform": "ios",
+  "github": {
+    "owner": "minhhai1356tq-sudo",
+    "repo": "Buildipa"
+  },
+  "provider": "github",
+  "codemagic": {},
+  "bitrise": {},
+  "ios": {},
+  "flutter": {
+    "watch": {}
+  },
+  "reactNative": {},
+  "kmp": {},
+  "mobai": {}
+}
