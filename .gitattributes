@@ -1,3 +1,0 @@
-# Auto detect text files and perform LF normalization
-* text=auto
-assets/live2d/hiyori_free/ReadMe.txt text eol=lf
